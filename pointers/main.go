@@ -11,6 +11,7 @@ func main() {
 
 	var prt = &myNumbers
 
+	fmt.Println(prt)
 	fmt.Println(*prt)
 
 	*prt = *prt + 2
