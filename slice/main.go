@@ -44,7 +44,6 @@ func main() {
 	fmt.Println(courses)
 
 	var index int = 2
-
 	courses = append(courses[:index], courses[index+2:]...)
 
 	fmt.Println(courses)
