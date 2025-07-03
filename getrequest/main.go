@@ -4,13 +4,36 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
 func main() {
 
 	// getRequse()
-	postJsonRequest()
+	// postJsonRequest()
+
+	postFormRequest()
+
+}
+
+func postFormRequest() {
+	const myUrl = "https://portfolio-server-vert-five.vercel.app/skills"
+
+	// formdata
+
+	data := url.Values{}
+
+	data.Add("name", "Habiba")
+	data.Add("image", "Amr hidoyei tmi")
+
+	res, err := http.PostForm(myUrl, data)
+	checkNilErr(err)
+
+	defer res.Body.Close()
+
+	content, err := ioutil.ReadAll(res.Body)
+	fmt.Println(string(content))
 
 }
 
