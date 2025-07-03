@@ -12,7 +12,42 @@ type skill struct {
 
 func main() {
 
-	encodeJson()
+	// encodeJson()
+	decodeJson()
+
+}
+
+func decodeJson() {
+
+	jsonDataFromWeb := []byte(`
+	 		{        
+					"name": "Rezwan",     
+			       "image": "Sotto "  
+			}
+	`)
+
+	var skills skill
+
+	checkValidate := json.Valid(jsonDataFromWeb)
+
+	if checkValidate {
+		fmt.Println("JSON was validated")
+		json.Unmarshal(jsonDataFromWeb, &skills)
+
+		fmt.Printf("%#v\n", skills)
+	} else {
+		fmt.Println("JSON was not valid")
+	}
+
+	// some case where you just want to add data ti key value pair
+	var newSkill map[string]interface{}
+
+	json.Unmarshal(jsonDataFromWeb, &newSkill)
+	fmt.Printf("%#v\n", newSkill)
+
+	for k, v := range newSkill {
+		fmt.Printf("key is %v and the value is %v and type is: %T\n", k, v, v)
+	}
 
 }
 
