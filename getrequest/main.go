@@ -8,13 +8,42 @@ import (
 )
 
 func main() {
-	getRequse()
+
+	// getRequse()
+	postJsonRequest()
+
+}
+
+func postJsonRequest() {
+	const myUrl = "https://portfolio-server-vert-five.vercel.app/skills"
+
+	// fake json fayload
+
+	requestBody := strings.NewReader(`
+
+			{
+				    "name": "Firebase",
+    				"image": "https://waliullah99.netlify.app/assets/firebase-2zL_EyTg.png"
+
+			}
+
+		`)
+
+	response, err := http.Post(myUrl, "application/json", requestBody)
+	checkNilErr(err)
+
+	defer response.Body.Close()
+
+	content, err := ioutil.ReadAll(response.Body)
+	checkNilErr(err)
+
+	fmt.Println(string(content))
 
 }
 
 func getRequse() {
 	// const myUrl = "http://localhost:8000/get"
-	const myUrl = "https://portfolio-server-vert-five.vercel.app"
+	const myUrl = "https://portfolio-server-vert-five.vercel.app/skills"
 
 	res, err := http.Get(myUrl)
 	checkNilErr(err)
