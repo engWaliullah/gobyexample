@@ -53,3 +53,27 @@ func getAllCourses(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(courses)
 }
+
+func getSingleCourse(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("Get single course")
+	w.Header().Set("Content-Type", "application/json")
+
+	// grab id from request
+
+	params := mux.Vars(r)
+
+	for _, course := range courses {
+		if course.CourseId == params["id"] {
+			json.NewEncoder(w).Encode(course)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode("no course found with provided ID")
+	return
+}
+
+func createSingleCourse(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("Create single course")
+	w.Header().Set("Content-Type", "application/json")
+
+}
