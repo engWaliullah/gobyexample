@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -43,4 +45,11 @@ func main() {
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<h1> Welcome to new era </h1>"))
+}
+
+func getAllCourses(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("Get all courses")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(courses)
 }
