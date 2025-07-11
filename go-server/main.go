@@ -206,10 +206,35 @@ func getAllMenus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(menus)
 }
 
+func creatMenu(w http.ResponseWriter, r *http.Request) {
+	var menu struct {
+		Item string `json:"item"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&menu)
+	if err != nil || menu.Item == "" {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.Exec("INSERT INTO menus (item) VALUES ($1)",
+		menu.Item)
+
+	if err != nil {
+		http.Error(w, "Failed to insert menus item", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	fmt.Fprintln(w, "Menu item is created")
+}
+
 func menuHandlar(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		getAllMenus(w, r)
+	case "POST":
+		creatMenu(w, r)
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
