@@ -229,12 +229,41 @@ func creatMenu(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Menu item is created")
 }
 
+func deleteMenu(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		ID int `json:"id"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil || data.ID == 0 {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	result, err := db.Exec("DELETE FROM menus WHERE id = $1", data.ID)
+	if err != nil {
+		http.Error(w, "Failed to delete menu item", http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		http.Error(w, "No menu item found to delete", http.StatusNotFound)
+		return
+	}
+
+	fmt.Fprintln(w, "Menu item deleted successfully")
+}
+
 func menuHandlar(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		getAllMenus(w, r)
 	case "POST":
 		creatMenu(w, r)
+
+	case "DELETE":
+		deleteMenu(w, r)
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
