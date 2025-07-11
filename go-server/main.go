@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	_ "github.com/lib/pq"
 )
@@ -206,6 +207,28 @@ func getAllMenus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(menus)
 }
 
+func getSingleMenu(w http.ResponseWriter, r *http.Request, idStr string) {
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid menu ID", http.StatusBadRequest)
+		return
+	}
+
+	var menu Menus
+	err = db.QueryRow("SELECT id, item FROM menus WHERE id = $1", id).Scan(&menu.ID, &menu.Item)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Menu item not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Failed to fetch menu item", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(menu)
+}
+
 func creatMenu(w http.ResponseWriter, r *http.Request) {
 	var menu struct {
 		Item string `json:"item"`
@@ -285,7 +308,12 @@ func deleteMenu(w http.ResponseWriter, r *http.Request) {
 func menuHandlar(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		getAllMenus(w, r)
+		id := r.URL.Query().Get("id")
+		if id != "" {
+			getSingleMenu(w, r, id)
+		} else {
+			getAllMenus(w, r)
+		}
 	case "POST":
 		creatMenu(w, r)
 
