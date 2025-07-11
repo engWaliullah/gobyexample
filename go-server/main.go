@@ -229,6 +229,33 @@ func creatMenu(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Menu item is created")
 }
 
+func updateMenu(w http.ResponseWriter, r *http.Request) {
+	var menu struct {
+		ID   int    `json:"id"`
+		Item string `json:"item"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&menu)
+	if err != nil || menu.ID == 0 || menu.Item == "" {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	result, err := db.Exec("UPDATE menus SET item = $1 WHERE id = $2", menu.Item, menu.ID)
+	if err != nil {
+		http.Error(w, "Failed to update menu item", http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		http.Error(w, "No menu item found to update", http.StatusNotFound)
+		return
+	}
+
+	fmt.Fprintln(w, "Menu item updated successfully")
+}
+
 func deleteMenu(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		ID int `json:"id"`
@@ -261,6 +288,9 @@ func menuHandlar(w http.ResponseWriter, r *http.Request) {
 		getAllMenus(w, r)
 	case "POST":
 		creatMenu(w, r)
+
+	case "PUT":
+		updateMenu(w, r)
 
 	case "DELETE":
 		deleteMenu(w, r)
